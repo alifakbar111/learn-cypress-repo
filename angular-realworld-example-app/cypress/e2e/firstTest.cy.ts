@@ -1,8 +1,14 @@
 describe("Test with backend", () => {
   beforeEach("login to application", () => {
-    cy.intercept("GET", "https://api.realworld.io/api/tags", {
-      fixture: "tags.json",
-    });
+    cy.intercept(
+      {
+        method: "GET",
+        path: "tags",
+      },
+      {
+        fixture: "tags.json",
+      }
+    );
     cy.loginToApplication();
   });
 
@@ -28,13 +34,50 @@ describe("Test with backend", () => {
     cy.wait("@postArticles");
 
     cy.get("@postArticles").then((xhr: XMLHttpRequest["response"]) => {
-      console.log(xhr);
       expect(xhr.response.statusCode).to.equal(200);
       expect(xhr.response.body.article.body).to.equal(
         "this is a body of the article"
       );
       expect(xhr.response.body.article.description).to.equal(
         "this is a description"
+      );
+    });
+  });
+
+  it.only("intercepting and modifying the request and response", () => {
+    const randomNumber = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+
+    // cy.intercept("POST", "https://api.realworld.io/api/articles/", (req) => {
+    //   req.body.article.description = "this is a description 2";
+    // }).as("postArticles");
+    cy.intercept("POST", "https://api.realworld.io/api/articles/", (req) => {
+      req.reply((res) => {
+        expect(res.body.article.description).to.equal("this is a description");
+        res.body.article.description = "this is a description 2";
+      });
+    }).as("postArticles");
+
+    cy.contains("New Article").click();
+    cy.get('input[formcontrolname="title"]').type(
+      `this is the title-${randomNumber}`
+    );
+    cy.get('input[formcontrolname="description"]').type(
+      "this is a description"
+    );
+    cy.get('textarea[formcontrolname="body"]').type(
+      "this is a body of the article"
+    );
+    cy.get("button").contains("Publish Article").click();
+
+    cy.wait("@postArticles");
+
+    cy.get("@postArticles").then((xhr: XMLHttpRequest["response"]) => {
+      expect(xhr.response.statusCode).to.equal(200);
+      expect(xhr.response.body.article.body).to.equal(
+        "this is a body of the article"
+      );
+      expect(xhr.response.body.article.description).to.equal(
+        "this is a description 2"
       );
     });
   });
@@ -46,7 +89,7 @@ describe("Test with backend", () => {
       .and("contain", "testing");
   });
 
-  it.only("varify global feed like count", () => {
+  it("varify global feed like count", () => {
     cy.intercept("GET", "https://api.realworld.io/api/articles/feed*", {
       articles: [],
       articlesCount: 0,
@@ -57,7 +100,9 @@ describe("Test with backend", () => {
     }).as("getGlobalFeed");
 
     cy.contains("Global Feed").click();
-    cy.wait("@getGlobalFeed");
+    cy.wait("@getGlobalFeed", {
+      timeout: 2000,
+    });
     cy.get("app-article-list button").then((heartList) => {
       expect(heartList[0]).to.contain("1");
       expect(heartList[1]).to.contain("5");
