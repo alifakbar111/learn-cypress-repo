@@ -1,0 +1,39 @@
+{
+  "articles": [
+    {
+      "slug": "This-is-a-New-2Titless-1850",
+      "title": "title 1",
+      "description": "This is description",
+      "body": "This is a body of the Article",
+      "tagList": ["Tag Body"],
+      "createdAt": "2023-05-19T13:47:47.175Z",
+      "updatedAt": "2023-05-19T13:47:47.175Z",
+      "favorited": false,
+      "favoritesCount": 1,
+      "author": {
+        "username": "CyTestUser",
+        "bio": "2222",
+        "image": "https://i.stack.imgur.com/34AD2.jpg",
+        "following": false
+      }
+    },
+    {
+      "slug": "This-is-a-New-3222Titless-1850",
+      "title": "title 2",
+      "description": "This is description",
+      "body": "This is a body of the Article",
+      "tagList": ["Tag Body"],
+      "createdAt": "2023-05-19T13:47:23.402Z",
+      "updatedAt": "2023-05-19T13:47:23.402Z",
+      "favorited": false,
+      "favoritesCount": 5,
+      "author": {
+        "username": "CyTestUser",
+        "bio": "2222",
+        "image": "https://i.stack.imgur.com/34AD2.jpg",
+        "following": false
+      }
+    }
+  ],
+  "articlesCount": 2
+}

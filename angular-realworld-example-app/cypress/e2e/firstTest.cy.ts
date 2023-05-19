@@ -39,7 +39,41 @@ describe("Test with backend", () => {
     });
   });
 
-  it.only("verify popular tags are displayed", () => {
-    cy.log("we logged in");
+  it("verify popular tags are displayed", () => {
+    cy.get(".tag-list")
+      .should("contain", "cypress")
+      .and("contain", "automation")
+      .and("contain", "testing");
+  });
+
+  it.only("varify global feed like count", () => {
+    cy.intercept("GET", "https://api.realworld.io/api/articles/feed*", {
+      articles: [],
+      articlesCount: 0,
+    });
+
+    cy.intercept("GET", "https://api.realworld.io/api/articles*", {
+      fixture: "articles.json",
+    }).as("getGlobalFeed");
+
+    cy.contains("Global Feed").click();
+    cy.wait("@getGlobalFeed");
+    cy.get("app-article-list button").then((heartList) => {
+      expect(heartList[0]).to.contain("1");
+      expect(heartList[1]).to.contain("5");
+    });
+
+    cy.fixture("articles.json").then((file) => {
+      const articleLink = file.articles[1].slug;
+      file.articles[1].favoritesCount = 6;
+
+      cy.intercept(
+        "POST",
+        `https://api.realworld.io/api/articles/${articleLink}/favorite`,
+        file
+      );
+
+      cy.get("app-article-list button").eq(1).click().should("contain", "6");
+    });
   });
 });
