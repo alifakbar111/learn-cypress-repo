@@ -1,6 +1,8 @@
 import { defineConfig } from "cypress";
 
 export default defineConfig({
+  // to disabled video result
+  // video: false,
   e2e: {
     baseUrl: "http://localhost:4200",
     specPattern: "cypress/**/**/*.{js,jsx,ts,tsx}",
