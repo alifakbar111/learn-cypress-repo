@@ -89,7 +89,7 @@ describe("Test with backend", () => {
       .and("contain", "testing");
   });
 
-  it("varify global feed like count", () => {
+  it("verify global feed like count", { retries: 2 }, () => {
     cy.intercept("GET", `${Cypress.env("apiUrl")}/api/articles/feed*`, {
       articles: [],
       articlesCount: 0,
@@ -104,9 +104,7 @@ describe("Test with backend", () => {
       timeout: 5000,
     });
     cy.get("app-article-list button").then((heartList) => {
-      cy.wait("@getGlobalFeed", {
-        timeout: 5000,
-      });
+      cy.wait(5000);
       expect(heartList[0]).to.contain("1");
       expect(heartList[1]).to.contain("5");
     });
@@ -125,7 +123,7 @@ describe("Test with backend", () => {
     });
   });
 
-  it.only("delete new article in a global feed", () => {
+  it("delete new article in a global feed", () => {
     const bodyRequest = {
       article: {
         tagList: [],

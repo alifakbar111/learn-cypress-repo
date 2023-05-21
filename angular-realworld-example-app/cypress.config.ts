@@ -13,6 +13,10 @@ export default defineConfig({
     runMode: 2,
     openMode: 0,
   },
+  reporter: "cypress-multi-reporters",
+  reporterOptions: {
+    configFile: "reporter-config.json",
+  },
   e2e: {
     baseUrl: "http://localhost:4200",
     specPattern: "cypress/**/**/*.{js,jsx,ts,tsx}",
