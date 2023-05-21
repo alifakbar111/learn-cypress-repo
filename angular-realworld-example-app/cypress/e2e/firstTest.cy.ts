@@ -15,7 +15,7 @@ describe("Test with backend", () => {
   it("verify correct request and response", () => {
     const randomNumber = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
-    cy.intercept("POST", "https://api.realworld.io/api/articles/").as(
+    cy.intercept("POST", `${Cypress.env("apiUrl")}/api/articles/`).as(
       "postArticles"
     );
 
@@ -50,7 +50,7 @@ describe("Test with backend", () => {
     // cy.intercept("POST", "https://api.realworld.io/api/articles/", (req) => {
     //   req.body.article.description = "this is a description 2";
     // }).as("postArticles");
-    cy.intercept("POST", "https://api.realworld.io/api/articles/", (req) => {
+    cy.intercept("POST", `${Cypress.env("apiUrl")}/api/articles/`, (req) => {
       req.reply((res) => {
         expect(res.body.article.description).to.equal("this is a description");
         res.body.article.description = "this is a description 2";
@@ -90,12 +90,12 @@ describe("Test with backend", () => {
   });
 
   it("varify global feed like count", () => {
-    cy.intercept("GET", "https://api.realworld.io/api/articles/feed*", {
+    cy.intercept("GET", `${Cypress.env("apiUrl")}/api/articles/feed*`, {
       articles: [],
       articlesCount: 0,
     });
 
-    cy.intercept("GET", "https://api.realworld.io/api/articles*", {
+    cy.intercept("GET", `${Cypress.env("apiUrl")}/api/articles*`, {
       fixture: "articles.json",
     }).as("getGlobalFeed");
 
@@ -117,7 +117,7 @@ describe("Test with backend", () => {
 
       cy.intercept(
         "POST",
-        `https://api.realworld.io/api/articles/${articleLink}/favorite`,
+        `${Cypress.env("apiUrl")}/api/articles/${articleLink}/favorite`,
         file
       );
 
@@ -125,20 +125,21 @@ describe("Test with backend", () => {
     });
   });
 
-  it("delete new article in a global feed", () => {
+  it.only("delete new article in a global feed", () => {
     const bodyRequest = {
       article: {
         tagList: [],
-        title: "test title 123",
-        description: "test about 123",
-        body: "test description 123",
+        title: "Request from the API easy",
+        description: "API testing is easy",
+        body: "Angular is cool",
       },
     };
 
     cy.get("@token").then((token) => {
+      cy.wait(10000);
       cy.request({
         method: "POST",
-        url: "https://api.realworld.io/api/articles/",
+        url: `${Cypress.env("apiUrl")}/api/articles/`,
         headers: { Authorization: `Token ${token}` },
         body: bodyRequest,
       }).then((resp) => {
@@ -150,15 +151,17 @@ describe("Test with backend", () => {
 
       cy.get(".article-actions").contains("Delete Article").click();
 
+      cy.contains("Global Feed").click();
       cy.request({
         method: "GET",
-        url: "https://api.realworld.io/api/articles?limit=10&offset=0",
+        url: `${Cypress.env("apiUrl")}/api/articles?limit=10&offset=0`,
         headers: { Authorization: `Token ${token}` },
       })
         .its("body")
         .then((body) => {
-          cy.wait(5000);
-          expect(body.articles[0].title).not.to.equal("test title 123");
+          expect(body.articles[0].title).not.to.equal(
+            "Request from the API easy"
+          );
         });
     });
   });

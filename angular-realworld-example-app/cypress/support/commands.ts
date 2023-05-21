@@ -6,12 +6,17 @@ declare namespace Cypress {
 
 Cypress.Commands.add("loginToApplication", () => {
   const userCredential = {
-    user: { email: "artem.bondar16@gmail.com", password: "CypressTest1" },
+    // user: { email: "artem.bondar16@gmail.com", password: "CypressTest1" },
+    user: {
+      email: Cypress.env("username"),
+      password: Cypress.env("password"),
+    },
   };
 
   cy.request({
     method: "POST",
-    url: "https://api.realworld.io/api/users/login",
+    // url: "https://api.realworld.io/api/users/login",
+    url: `${Cypress.env("apiUrl")}/api/users/login`,
     body: userCredential,
   })
     .its("body")
